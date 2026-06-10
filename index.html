@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PiEnglish Kids</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Pi SDK -->
+  <!-- Pi SDK - bỏ comment khi deploy lên Pi Browser -->
+<!-- <script src="https://sdk.minepi.com/pi-sdk.js"></script> -->
+</head>
+<body>
+
+  <!-- ========== MÀNG HÌNH ĐĂNG NHẬP ========== -->
+  <div id="loginScreen" class="screen active">
+    <div class="cat-logo">🐱</div>
+    <h1>PiEnglish Kids</h1>
+    <p>Phiêu lưu cùng Mèo Con · Học Tiếng Anh!</p>
+    <button id="btnLogin" onclick="loginWithPi()">
+      Đăng nhập bằng Pi
+    </button>
+  </div>
+
+  <!-- ========== GAME SCREEN (hiện sau khi đăng nhập) ========== -->
+  <div id="gameScreen" style="display:none">
+
+    <!-- ===== BẢN ĐỒ ===== -->
+    <div id="mapScreen" class="screen">
+
+      <div class="map-header">
+        <div class="player-left">
+          <div class="cat-mini-wrap">🐱</div>
+          <div>
+            <div class="player-name">Mèo Con</div>
+            <div class="player-lv">
+              Lv.<span id="mapLv">1</span>
+              · <span id="mapExp">0</span>/100 EXP
+            </div>
+          </div>
+        </div>
+        <div class="hud-right">
+          <div class="chip chip-hp">
+            ❤️ <span id="mapHP">100</span>
+          </div>
+          <div class="chip chip-pi">
+            π <span id="mapPi">0.000</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-title">🗺️ Bản đồ thế giới</div>
+      <div class="zones-grid" id="zonesGrid"></div>
+
+    </div>
+
+    <!-- ===== CHIẾN ĐẤU ===== -->
+    <div id="battleScreen" class="screen">
+
+      <div class="battle-topbar">
+        <button class="btn-back" onclick="showMap()">← Bản đồ</button>
+        <div class="zone-badge" id="battleLabel">Rừng Xanh</div>
+      </div>
+
+      <div class="prog-wrap">
+        <div class="prog-bar">
+          <div class="prog-fill" id="progFill" style="width:0%"></div>
+        </div>
+        <div class="prog-txt" id="progTxt">0/6</div>
+      </div>
+
+      <div class="fighters">
+        <div class="fighter">
+          <span class="fighter-sprite">🐱</span>
+          <div class="fighter-name">Mèo Con</div>
+          <div class="hp-bar">
+            <div class="hp-fill hero-fill" id="heroBar" style="width:100%"></div>
+          </div>
+        </div>
+        <div class="vs-txt">VS</div>
+        <div class="fighter">
+          <span class="fighter-sprite" id="enemySprite">👾</span>
+          <div class="fighter-name" id="enemyName">Quái Từ</div>
+          <div class="hp-bar">
+            <div class="hp-fill enemy-fill" id="enemyBar" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lvup" id="lvupBanner">
+        <div class="lvup-title">🎉 LEVEL UP!</div>
+        <div id="lvupSub">Lên Level 2! HP tối đa +20!</div>
+      </div>
+
+      <div class="word-card" id="wordCard" onclick="flipCard()">
+        <span class="word-emoji" id="wEmoji">🐶</span>
+        <div class="word-en" id="wEn">DOG</div>
+        <div class="word-ipa" id="wIpa">/dɒɡ/</div>
+        <div class="tap-hint">👆 Nhấn để xem nghĩa</div>
+        <div class="word-reveal" id="wordReveal">
+          <div class="word-vn" id="wVn">Con chó</div>
+        </div>
+      </div>
+
+      <div class="quiz-box" id="quizBox" style="display:none">
+        <div class="quiz-q" id="quizQ">Câu hỏi</div>
+        <div class="quiz-grid" id="quizGrid"></div>
+      </div>
+
+      <div class="fxbar" id="fxEl"></div>
+
+      <button class="btn-next" id="btnNext"
+        onclick="nextWord()" style="display:none">
+        Từ tiếp theo ⚔️
+      </button>
+
+    </div>
+
+    <!-- ===== CHIẾN THẮNG ===== -->
+    <div id="victoryScreen" class="screen">
+
+      <span class="v-trophy" id="vTrophy">🏆</span>
+      <div class="v-title" id="vTitle">Xuất sắc! 🎉</div>
+      <div class="v-sub" id="vSub">Đã giải phóng vùng đất này!</div>
+      <div class="v-stars" id="vStars">⭐⭐⭐</div>
+
+      <div class="reward-card">
+        <div class="rw-row">
+          <span class="rw-lbl">Điểm số</span>
+          <span class="rw-val" id="rwScore">-</span>
+        </div>
+        <div class="rw-row">
+          <span class="rw-lbl">Độ chính xác</span>
+          <span class="rw-val" id="rwAcc">-</span>
+        </div>
+        <div class="rw-row">
+          <span class="rw-lbl">Pi nhận được</span>
+          <span class="rw-val" id="rwPi">-</span>
+        </div>
+        <div class="rw-row">
+          <span class="rw-lbl">EXP nhận được</span>
+          <span class="rw-val" id="rwExp">-</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-outline" onclick="showMap()">
+          🗺️ Bản đồ
+        </button>
+        <button class="btn-gold" id="btnNextZone"
+          onclick="goNextZone()">
+          Vùng kế ⚔️
+        </button>
+      </div>
+
+    </div>
+
+  </div><!-- end #gameScreen -->
+
+  <!-- Game JS — phải đặt SAU Pi SDK -->
+  <script src="game.js"></script>
+
+</body>
+</html>
